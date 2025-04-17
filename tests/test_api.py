@@ -57,15 +57,3 @@ class TestAPI:
         response = requests.post(f"{url}", json=data)
 
         assert response.status_code == 400, f"Ожидался статус 400, получен {response.status_code}"
-
-    '''@pytest.mark.parametrize("p1, p2, p3, p4, p5, p6, p7",
-                             [(-1000000, 0.1, 50, 5, 10, False, True),
-                              (1000000, -0.1, 50, 5, 10, False, True),
-                              (1000000, 0.1, -50, 5, 10, False, True),
-                              (1000000, 0.1, 50, -5, 10, False, True),
-                              (1000000, 0.1, 50, 5, -10, False, True),
-                              (1000000, 0.1, 50, 0, 10, False, True),
-                              (1000000, 0.1, 50, 5, 0, False, True),
-                              (1000000, 0.1, 50, 15, 10, False, True)
-                              ])
-    def test_update_wave_config_negative(self, config_update_api, p1, p2, p3, p4, p5, p6, p7):'''
