@@ -32,3 +32,16 @@ def setup_db():
     conn.commit()
     conn.close()
     yield
+
+@pytest.fixture(scope="session")
+def base_url():
+    return "https://reqres.in"
+
+@pytest.fixture(scope="session")
+def endpoint():
+    return "/api/register"
+
+@pytest.fixture
+def url(base_url, endpoint):
+    url = f"{base_url}{endpoint}"
+    return url
