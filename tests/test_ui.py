@@ -1,37 +1,76 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 
 class TestIU:
-    # Регистрация с валидными данными
+    # Ввод валидных данных в обязательные поля
     def test_valid(self):
         driver = webdriver.Chrome()
-
         # Открыть страницу с формой логина
         driver.get("https://demoqa.com/automation-practice-form")
-        time.sleep(3)
         # Ввести имя
-        firstname_input = driver.find_element(By.ID, "firstName")
-        firstname_input.send_keys("Дарья")
-        time.sleep(3)
+        driver.find_element(By.ID, "firstName").send_keys("Дарья")
         # Ввести фамилию
-        lastname_input = driver.find_element(By.ID, "lastName")
-        lastname_input.send_keys("Иванова")
-        time.sleep(3)
+        driver.find_element(By.ID, "lastName").send_keys("Иванова")
         # Выбрать пол
-        radio_button = driver.find_element(By.CSS_SELECTOR, "label[for='gender-radio-2']")
-        radio_button.click()
-        time.sleep(3)
+        driver.find_element(By.CSS_SELECTOR, "label[for='gender-radio-2']").click()
         # Ввести номер
-        usernumber_input = driver.find_element(By.ID, "userNumber")
-        usernumber_input.send_keys("9106667711")
+        driver.find_element(By.ID, "userNumber").send_keys("9106667711")
+        # Нажать кнопку submit
+        driver.find_element(By.ID, "submit").click()
         time.sleep(3)
-        # Нажать кнопку логина
-        submit_button = driver.find_element(By.ID, "submit")
-        submit_button.click()
+        # Проверить, что осуществился переход на алерт с заполненной формой
+        WebDriverWait(driver, 10).until(
+            EC.visibility_of_element_located((By.CLASS_NAME, "modal-content"))
+        )
+        modal_title = driver.find_element(By.CLASS_NAME, "modal-header").text
+        assert "Thanks for submitting the form" in modal_title
+        # Проверить, что значения в форме соответствуют введенным
+        label_td = driver.find_element(By.XPATH, "//td[text()='Student Name']")
+        value_td = label_td.find_element(By.XPATH, "following-sibling::td")
+        name = value_td.text
+        assert name == "Дарья Иванова"
+        label_td = driver.find_element(By.XPATH, "//td[text()='Gender']")
+        value_td = label_td.find_element(By.XPATH, "following-sibling::td")
+        name = value_td.text
+        assert name == "Female"
+        label_td = driver.find_element(By.XPATH, "//td[text()='Mobile']")
+        value_td = label_td.find_element(By.XPATH, "following-sibling::td")
+        name = value_td.text
+        assert name == "9106667711"
+
+        driver.quit()
+
+    #Ошибка при незаполненных обязательных полях
+    def test_empty_fields(self):
+        driver = webdriver.Chrome()
+        # Открыть страницу с формой логина
+        driver.get("https://demoqa.com/automation-practice-form")
+        # Нажать кнопку submit, не заполняя поля
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        driver.find_element(By.ID, "submit").click()
         time.sleep(3)
-        # Проверить, что вход выполнен успешно
-        time.sleep(5)
+        # Проверяем, что пустые обязательные поля подсветились красным
+        first_name_input = driver.find_element(By.ID, "firstName")
+        border_color = first_name_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
+        lastName_input = driver.find_element(By.ID, "lastName")
+        border_color = lastName_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
+        userNumber_input = driver.find_element(By.ID, "userNumber")
+        border_color = userNumber_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
+        gender_radio_input = driver.find_element(By.CSS_SELECTOR, "label[for='gender-radio-1']")
+        border_color = gender_radio_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
+        gender_radio_input = driver.find_element(By.CSS_SELECTOR, "label[for='gender-radio-2']")
+        border_color = gender_radio_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
+        gender_radio_input = driver.find_element(By.CSS_SELECTOR, "label[for='gender-radio-3']")
+        border_color = gender_radio_input.value_of_css_property("border-color")
+        assert border_color == "rgb(220, 53, 69)"
 
         driver.quit()
